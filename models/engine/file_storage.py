@@ -8,7 +8,6 @@ from models.city import City
 from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
-import shlex
 
 
 class FileStorage:
@@ -20,23 +19,28 @@ class FileStorage:
     """
     __file_path = "file.json"
     __objects = {}
+    all_classes = {'BaseModel': BaseModel, 'User': User,
+                   'State': State, 'City': City, 'Amenity': Amenity,
+                   'Place': Place, 'Review': Review}
 
     def all(self, cls=None):
         """returns a dictionary
         Return:
             returns a dictionary of __object
         """
-        dic = {}
+        all_return = {}
+
+        # if cls is valid
         if cls:
-            dictionary = self.__objects
-            for key in dictionary:
-                partition = key.replace('.', ' ')
-                partition = shlex.split(partition)
-                if (partition[0] == cls.__name__):
-                    dic[key] = self.__objects[key]
-            return (dic)
-        else:
-            return self.__objects
+            if cls.__name__ in self.all_classes:
+                # copy objects of cls to temp dict
+                for key, val in self.__objects.items():
+                    if key.split('.')[0] == cls.__name__:
+                        all_return.update({key: val})
+        else:  # if cls is none
+            all_return = self.__objects
+
+        return all_return
 
     def new(self, obj):
         """sets __object to given obj
@@ -67,14 +71,15 @@ class FileStorage:
         except FileNotFoundError:
             pass
 
+    def close(self):
+        """Reload JSON objects
+        """
+        return self.reload()
+
     def delete(self, obj=None):
-        """ delete an existing element
+        """delete obj from __objects if present
         """
         if obj:
+            # format key from obj
             key = "{}.{}".format(type(obj).__name__, obj.id)
             del self.__objects[key]
-
-    def close(self):
-        """ calls reload()
-        """
-        self.reload()
