@@ -1,8 +1,3 @@
-
-Curriculum
-SE Foundations
-Average: 71.03%
-You have a captain's log due before 2024-04-21 (in about 4 hours)! Log it now!
 0x02. AirBnB clone - MySQL
 Group project
 Python
