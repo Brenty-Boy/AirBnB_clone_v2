@@ -1,18 +1,15 @@
 #!/usr/bin/python3
-# Fabscript to distribute an archive to my web servers
-
+# Fabfile to distribute an archive to a web server.
 import os.path
 from fabric.api import env
 from fabric.api import put
 from fabric.api import run
 
 env.hosts = ['54.237.15.59', '52.3.249.72']
-env.user = 'ubuntu'
-env.key_filename = '~/.ssh/id_rsa'
+
 
 def do_deploy(archive_path):
     """Distributes an archive to a web server.
-
     Args:
         archive_path (str): The path of the archive to distribute.
     Returns:
