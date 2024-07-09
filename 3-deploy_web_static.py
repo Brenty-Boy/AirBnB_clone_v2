@@ -44,9 +44,11 @@ def do_deploy(archive_path):
 
         # Extract archive to /data/web_static/releases/<archive_name>/
         archive_filename = os.path.basename(archive_path).split('.')[0]
-        release_path = '/data/web_static/releases/{}/'.format(archive_filename)
+        release_path =
+        '/data/web_static/releases/{}/'.format(archive_filename)
         run('mkdir -p {}'.format(release_path))
-        run('tar -xzf /tmp/{}.tgz -C {}'.format(archive_filename, release_path))
+        run('tar -xzf /tmp/{}.tgz -C {}'.format(
+            archive_filename, release_path))
 
         # Remove uploaded archive from /tmp/
         run('rm /tmp/{}.tgz'.format(archive_filename))
