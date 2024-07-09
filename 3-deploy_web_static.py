@@ -72,4 +72,7 @@ def deploy():
         return False
 
     # Deploy the created archive
-    return do_deploy(archive_path)
+    if not do_deploy(archive_path):
+        return False
+
+    return True
