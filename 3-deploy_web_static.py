@@ -22,10 +22,9 @@ def do_pack():
         now = datetime.now().strftime('%Y%m%d%H%M%S')
         archive_path = 'versions/web_static_{}.tgz'.format(now)
         local('mkdir -p versions')
-        result = local('tar -cvzf {} web_static'.format(archive_path))
-        if result.failed:
-            return None
-        print('web_static packed: {} -> {}Bytes'.format(archive_path, os.path.getsize(archive_path)))
+        local('tar -cvzf {} web_static'.format(archive_path))
+        print('web_static packed: {} -> {}Bytes'.format(
+            archive_path, os.path.getsize(archive_path)))
         return archive_path
     except Exception as e:
         print(e)
@@ -58,7 +57,7 @@ def do_deploy(archive_path):
         # Delete the now-empty web_static directory
         run('rm -rf {}web_static'.format(release_path))
 
-        # Remove existing current and create new symlink
+        # Create symbolic link
         current_path = '/data/web_static/current'
         run('rm -rf {}'.format(current_path))
         run('ln -s {} {}'.format(release_path, current_path))
