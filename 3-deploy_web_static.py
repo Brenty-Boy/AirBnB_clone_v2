@@ -23,8 +23,7 @@ def do_pack():
         archive_path = 'versions/web_static_{}.tgz'.format(now)
         local('mkdir -p versions')
         local('tar -cvzf {} web_static'.format(archive_path))
-        print('web_static packed: {} -> {}Bytes'.format(
-            archive_path, os.path.getsize(archive_path)))
+        print('web_static packed: {} -> {}Bytes'.format(archive_path, os.path.getsize(archive_path)))
         return archive_path
     except Exception as e:
         print(e)
@@ -44,8 +43,7 @@ def do_deploy(archive_path):
 
         # Extract archive to /data/web_static/releases/<archive_name>/
         archive_filename = os.path.basename(archive_path).split('.')[0]
-        release_path =
-        '/data/web_static/releases/{}/'.format(archive_filename)
+        release_path = '/data/web_static/releases/{}/'.format(archive_filename)
         run('mkdir -p {}'.format(release_path))
         run('tar -xzf /tmp/{}.tgz -C {}'.format(
             archive_filename, release_path))
