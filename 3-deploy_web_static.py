@@ -25,6 +25,7 @@ def do_pack():
         return None
     return archive_path
 
+
 def do_deploy(archive_path):
     """
     Distribute an archive to the web servers and deploy it.
@@ -60,6 +61,7 @@ def do_deploy(archive_path):
     except:
         return False
 
+
 def deploy():
     """
     Deploy web_static content to web servers.
@@ -70,4 +72,7 @@ def deploy():
         return False
 
     # Deploy the created archive
-    return do_deploy(archive_path)
+    if not do_deploy(archive_path):
+        return False
+
+    return True
