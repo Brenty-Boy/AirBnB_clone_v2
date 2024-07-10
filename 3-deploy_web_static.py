@@ -14,32 +14,33 @@ env.key_filename = "~/.ssh/id_rsa"
 
 
 def do_pack():
-    """
-    Create a compressed archive of web_static contents.
-    Returns path of the created archive, or None if failed.
-    """
-    try:
-        now = datetime.now().strftime('%Y%m%d%H%M%S')
-        archive_path = 'versions/web_static_{}.tgz'.format(now)
-        local('mkdir -p versions')
-        local('tar -cvzf {} web_static'.format(archive_path))
-        print('web_static packed: {} -> {}Bytes'.format(archive_path, os.path.getsize(archive_path)))
-        return archive_path
-    except Exception as e:
-        print(e)
-        return None
+"""
+Create a compressed archive of web_static contents.
+Returns path of the created archive, or None if failed.
+"""
+try:
+now = datetime.now().strftime('%Y%m%d%H%M%S')
+archive_path = 'versions/web_static_{}.tgz'.format(now)
+local('mkdir -p versions')
+local('tar -cvzf {} web_static'.format(archive_path))
+print('web_static packed: {} -> {}Bytes'.format(archive_path, os.path.getsize(archive_path)))
+        
+return archive_path
+except Exception as e:
+    print(e)
+return None
 
 
 def do_deploy(archive_path):
-    """
-    Distribute an archive to the web servers and deploy it.
-    """
-    if not archive_path or not os.path.exists(archive_path):
-        return False
+"""
+Distribute an archive to the web servers and deploy it.
+"""
+if not archive_path or not os.path.exists(archive_path):
+return False
 
-    try:
-        # Upload archive to /tmp/ on the remote server
-        put(archive_path, '/tmp/')
+try:
+    # Upload archive to /tmp/ on the remote server
+put(archive_path, '/tmp/')
 
         # Extract archive to /data/web_static/releases/<archive_name>/
         archive_filename = os.path.basename(archive_path).split('.')[0]
