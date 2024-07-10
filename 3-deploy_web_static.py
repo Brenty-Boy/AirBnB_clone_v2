@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 """
-Fabric script to deploy web_static content to multiple servers.
+Fabric script based on the file 2-do_deploy_web_static.py that creates and
+distributes an archive to the web servers
 """
 
 from fabric.api import env, local, put, run
 from datetime import datetime
-import os
+from os.path import exists, isdir
 
 # Set the environment
 env.hosts = ['54.237.15.59', '52.3.249.72']
@@ -14,77 +15,42 @@ env.key_filename = "~/.ssh/id_rsa"
 
 
 def do_pack():
-    """
-    Create a compressed archive of web_static contents.
-    Returns path of the created archive, or None if failed.
-    """
-
-
-try:
-    now = datetime.now().strftime('%Y%m%d%H%M%S')
-    archive_path = 'versions/web_static_{}.tgz'.format(now)
-    local('mkdir -p versions')
-    local('tar -cvzf {} web_static'.format(archive_path))
-    print('web_static packed: {} -> {}Bytes'.format(
-        archive_path, os.path.getsize(archive_path)))
-
-    return archive_path
-except Exception as e:
-    print(e)
-return None
+    """generates a tgz archive"""
+    try:
+        date = datetime.now().strftime("%Y%m%d%H%M%S")
+        if isdir("versions") is False:
+            local("mkdir versions")
+        file_name = "versions/web_static_{}.tgz".format(date)
+        local("tar -cvzf {} web_static".format(file_name))
+        return file_name
+    except:
+        return None
 
 
 def do_deploy(archive_path):
-    """
-    Distribute an archive to the web servers and deploy it.
-    """
-
-
-if not archive_path or not os.path.exists(archive_path):
-    return False
-
-try:
-    # Upload archive to /tmp/ on the remote server
-    put(archive_path, '/tmp/')
-
-    # Extract archive to /data/web_static/releases/<archive_name>/
-    archive_filename = os.path.basename(archive_path).split('.')[0]
-    release_path = '/data/web_static/releases/{}/'.format(archive_filename)
-    run('mkdir -p {}'.format(release_path))
-    run('tar -xzf /tmp/{}.tgz -C {}'.format(archive_filename, release_path))
-
-    # Remove uploaded archive from /tmp/
-    run('rm /tmp/{}.tgz'.format(archive_filename))
-
-    # Move contents to the proper location
-    run('mv {}web_static/* {}'.format(release_path, release_path))
-
-    # Delete the now-empty web_static directory
-    run('rm -rf {}web_static'.format(release_path))
-
-    # Create symbolic link
-    current_path = '/data/web_static/current'
-    run('rm -rf {}'.format(current_path))
-    run('ln -s {} {}'.format(release_path, current_path))
-
-    print('New version deployed!')
-    return True
-    except Exception as e:
-        print(e)
+    """distributes an archive to the web servers"""
+    if exists(archive_path) is False:
+        return False
+    try:
+        file_n = archive_path.split("/")[-1]
+        no_ext = file_n.split(".")[0]
+        path = "/data/web_static/releases/"
+        put(archive_path, '/tmp/')
+        run('mkdir -p {}{}/'.format(path, no_ext))
+        run('tar -xzf /tmp/{} -C {}{}/'.format(file_n, path, no_ext))
+        run('rm /tmp/{}'.format(file_n))
+        run('mv {0}{1}/web_static/* {0}{1}/'.format(path, no_ext))
+        run('rm -rf {}{}/web_static'.format(path, no_ext))
+        run('rm -rf /data/web_static/current')
+        run('ln -s {}{}/ /data/web_static/current'.format(path, no_ext))
+        return True
+    except:
         return False
 
 
 def deploy():
-    """
-    Deploy web_static content to web servers.
-    """
-    # Create archive and get archive path
+    """creates and distributes an archive to the web servers"""
     archive_path = do_pack()
-    if not archive_path:
+    if archive_path is None:
         return False
-
-    # Deploy the created archive
-    if not do_deploy(archive_path):
-        return False
-
-    return True
+    return do_deploy(archive_path)
