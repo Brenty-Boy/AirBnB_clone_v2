@@ -26,11 +26,11 @@ class Place(BaseModel, Base):
         user_id: user id
         name: name input
         description: string of description
-        number_rooms: number of room in int
+        number_rooms: number of rooms in int
         number_bathrooms: number of bathrooms in int
         max_guest: maximum guest in int
-        price_by_night:: pice for a staying in int
-        latitude: latitude in flaot
+        price_by_night:: price per night for staying in int
+        latitude: latitude in float
         longitude: longitude in float
         amenity_ids: list of Amenity ids
     """
